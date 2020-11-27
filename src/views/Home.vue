@@ -1,18 +1,30 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    123213
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
-
+import Mock from 'mockjs'
 export default {
   name: 'Home',
   components: {
-    HelloWorld
+  },
+  data() {
+    return {
+      
+    }
+  },
+  mounted(){
+    this.init();
+  },
+  methods:{
+    init(){
+      let you = Mock.mock({
+          "string|1-10": "★"
+      })
+      console.log(you)
+    }
   }
 }
 </script>
