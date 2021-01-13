@@ -21,7 +21,7 @@ module.exports = {
       sourceMap: false, // 开启 CSS source maps
       loaderOptions: {
           sass: {
-              data: `@import "~@/style/setting.scss";@import "~@/style/base.scss";`
+              data: `@import "~@/style/setting.scss";@import "~@/styles/base.scss";`
               // 如果sass-loader不小心装了新版，此处的data要换成prependData
               // prependData: `@import "~@/style/setting.scss";`
           }

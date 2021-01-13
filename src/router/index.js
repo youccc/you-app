@@ -9,7 +9,17 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
-  }
+  },
+  {
+    path: '/draggable',
+    name: 'draggable',
+    component: () => import('../views/draggable.vue')
+  },
+  {
+    path: '/text',
+    name: 'text',
+    component: () => import('../views/text.vue')
+  },
 ]
 
 const router = new VueRouter({

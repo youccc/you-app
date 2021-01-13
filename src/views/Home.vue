@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div>
     123213
   </div>
 </template>
