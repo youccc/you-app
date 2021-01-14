@@ -2,8 +2,8 @@
   <div>
     <el-card>
       <el-row>
-          <span class="margin20" v-if="draggable">开启</span>
-          <span class="margin20" v-else >关闭</span>
+          <span class="margin20 open" v-if="draggable">开启</span>
+          <span class="margin20 close" v-else >关闭</span>
       </el-row>
       <el-row>
           <chart style="height:600px;width:100%" @click="handleChartClick" ref="chartLoad" :options="options" ></chart>
@@ -15,8 +15,8 @@
 <script>
 import chart from "vue-echarts/components/ECharts";
 import airportData from "@/assets/airport-schedule.json";
-const HEIGHT_RATIO = 0.6;
-const DIM_CATEGORY_INDEX = 0;
+const HEIGHT_RATIO = 0.9; //bar高度
+const DIM_CATEGORY_INDEX = 0; //尺寸分类索引
 const DIM_TIME_ARRIVAL = 1;
 const DIM_TIME_DEPARTURE = 2;
 const DATA_ZOOM_AUTO_MOVE_THROTTLE = 30;
@@ -48,8 +48,11 @@ export default {
   created(){
   },
   mounted(){
+    //数据
     this.rawData = airportData;
+    //数据传递
     this.options=this.makeOption()
+    //拖拽
     this.initDrag();
   },
   methods: {
@@ -185,11 +188,11 @@ export default {
     },
     //渲染器
     renderGanttItem(params, api) {
-        var categoryIndex = api.value(DIM_CATEGORY_INDEX);
-        var timeArrival = api.coord([api.value(DIM_TIME_ARRIVAL), categoryIndex]);
-        var timeDeparture = api.coord([api.value(DIM_TIME_DEPARTURE), categoryIndex]);
+        let categoryIndex = api.value(DIM_CATEGORY_INDEX);
+        let timeArrival = api.coord([api.value(DIM_TIME_ARRIVAL), categoryIndex]);
+        let timeDeparture = api.coord([api.value(DIM_TIME_DEPARTURE), categoryIndex]);
 
-        var coordSys = params.coordSys;
+        let coordSys = params.coordSys;
 
         this.cartesianXBounds[0] = coordSys.y;
         this.cartesianXBounds[1] = coordSys.y + coordSys.height;
@@ -197,24 +200,24 @@ export default {
         this.cartesianYBounds[0] = coordSys.y;
         this.cartesianYBounds[1] = coordSys.y + coordSys.height;
 
-        var barLength = timeDeparture[0] - timeArrival[0];
+        let barLength = timeDeparture[0] - timeArrival[0];
         // 得到y轴上长度1对应的高度
-        var barHeight = api.size([0, 1])[1] * HEIGHT_RATIO;
-        var x = timeArrival[0];
-        var y = timeArrival[1] - barHeight;
+        let barHeight = api.size([0, 1])[1] * HEIGHT_RATIO;
+        let x = timeArrival[0];
+        let y = timeArrival[1] - barHeight;
 
-        var flightNumber = api.value(3) + '';
-        var flightNumberWidth = this.$echarts.format.getTextRect(flightNumber).width;
-        var text = (barLength > flightNumberWidth + 40 && x + barLength >= 180)
+        let flightNumber = api.value(3) + '';
+        let flightNumberWidth = this.$echarts.format.getTextRect(flightNumber).width;
+        let text = (barLength > flightNumberWidth + 40 && x + barLength >= 180)
             ? flightNumber : '';
 
-        var rectNormal = this.clipRectByRect(params, {
+        let rectNormal = this.clipRectByRect(params, {
             x: x, y: y, width: barLength, height: barHeight
         });
-        var rectVIP = this.clipRectByRect(params, {
+        let rectVIP = this.clipRectByRect(params, {
             x: x, y: y, width: (barLength) / 2, height: barHeight
         });
-        var rectText = this.clipRectByRect(params, {
+        let rectText = this.clipRectByRect(params, {
             x: x, y: y, width: barLength, height: barHeight
         });
 
@@ -224,12 +227,12 @@ export default {
                 type: 'rect',
                 ignore: !rectNormal,
                 shape: rectNormal,
-                style: api.style()
+                style: api.style({fill: '#41B883'})
             }, {
                 type: 'rect',
                 ignore: !rectVIP && !api.value(4),
                 shape: rectVIP,
-                style: api.style({fill: '#ddb30b'})
+                style: api.style({fill: '#24ACF2'})
             }, {
                 type: 'rect',
                 ignore: !rectText,
@@ -245,7 +248,7 @@ export default {
     },
     //渲染轴标签
     renderAxisLabelItem(params, api) {
-        var y = api.coord([0, api.value(0)])[1];
+        let y = api.coord([0, api.value(0)])[1];
         if (y < params.coordSys.y + 5) {
             return;
         }
@@ -266,7 +269,7 @@ export default {
                     layout: 'cover'
                 },
                 style: {
-                    fill: '#368c6c'
+                    fill: '#F5DE19'
                 }
             }, {
                 type: 'text',
@@ -349,7 +352,7 @@ export default {
             timeArrival: param.value[DIM_TIME_ARRIVAL],
             timeDeparture: param.value[DIM_TIME_DEPARTURE]
         };
-        var style = {lineWidth: 2, fill: 'rgba(255,0,0,0.1)', stroke: 'rgba(255,0,0,0.8)', lineDash: [6, 3]};
+        let style = {lineWidth: 2, fill: 'rgba(255,0,0,0.1)', stroke: 'rgba(255,0,0,0.8)', lineDash: [6, 3]};
 
         this.draggingEl = this.addOrUpdateBar(this.draggingEl, this.draggingRecord, style, 100);
         this.draggingCursorOffset = [
@@ -363,8 +366,8 @@ export default {
         if (!this.draggingEl) {
             return;
         }
-        var cursorX = event.offsetX;
-        var cursorY = event.offsetY;
+        let cursorX = event.offsetX;
+        let cursorY = event.offsetY;
 
         // 移动 draggingEl.
         this.draggingEl.attr('position', [
@@ -404,11 +407,11 @@ export default {
     },
     //新增或者更新bar
     addOrUpdateBar(el, itemData, style, z) {
-            var pointArrival = this.$refs.chartLoad.chart.convertToPixel('grid', [itemData.timeArrival, itemData.categoryIndex]);
-            var pointDeparture = this.$refs.chartLoad.chart.convertToPixel('grid', [itemData.timeDeparture, itemData.categoryIndex]);
+            let pointArrival = this.$refs.chartLoad.chart.convertToPixel('grid', [itemData.timeArrival, itemData.categoryIndex]);
+            let pointDeparture = this.$refs.chartLoad.chart.convertToPixel('grid', [itemData.timeDeparture, itemData.categoryIndex]);
 
-            var barLength = pointDeparture[0] - pointArrival[0];
-            var barHeight = Math.abs(
+            let barLength = pointDeparture[0] - pointArrival[0];
+            let barHeight = Math.abs(
                 this.$refs.chartLoad.chart.convertToPixel('grid', [0, 0])[1] - this.$refs.chartLoad.chart.convertToPixel('grid', [0, 1])[1]
             ) * HEIGHT_RATIO;
 
@@ -429,9 +432,9 @@ export default {
     //准备投放
     prepareDrop() {
         // 检查可升降位置.
-        var xPixel = this.draggingEl.shape.x + this.draggingEl.position[0];
-        var yPixel = this.draggingEl.shape.y + this.draggingEl.position[1];
-        var cursorData = this.$refs.chartLoad.chart.convertFromPixel('grid', [xPixel, yPixel]);
+        let xPixel = this.draggingEl.shape.x + this.draggingEl.position[0];
+        let yPixel = this.draggingEl.shape.y + this.draggingEl.position[1];
+        let cursorData = this.$refs.chartLoad.chart.convertFromPixel('grid', [xPixel, yPixel]);
         if (cursorData) {
             // 制作dropshadow和dropRecord
             this.dropRecord = {
@@ -439,24 +442,24 @@ export default {
                 timeArrival: cursorData[0],
                 timeDeparture: cursorData[0] + this.draggingTimeLength
             };
-            var style = {fill: 'rgba(0,0,0,0.4)'};
+            let style = {fill: 'rgba(0,0,0,0.4)'};
             this.dropShadow = this.addOrUpdateBar(this.dropShadow,this.dropRecord, style, 99);
         }
     },
     // 这是一些商业逻辑，不要在意
     updateRawData() {
-        var flightData = this.rawData.flight.data;
-        var movingItem = flightData[this.draggingRecord.dataIndex];
+        let flightData = this.rawData.flight.data;
+        let movingItem = flightData[this.draggingRecord.dataIndex];
 
         // 检查冲突
-        for (var i = 0; i < flightData.length; i++) {
-            var dataItem = flightData[i];
+        for (let i = 0; i < flightData.length; i++) {
+            let dataItem = flightData[i];
             if (dataItem !== movingItem
                 && this.dropRecord.categoryIndex === dataItem[DIM_CATEGORY_INDEX]
                 && this.dropRecord.timeArrival < dataItem[DIM_TIME_DEPARTURE]
                 && this.dropRecord.timeDeparture > dataItem[DIM_TIME_ARRIVAL]
             ) {
-                alert('Conflict! Find a free space to settle the bar!');
+                alert('冲突！找一个空闲的地方安顿一下吧！');
                 return;
             }
         }
@@ -471,8 +474,8 @@ export default {
     autoDataZoomWhenDraggingOutside(cursorX, cursorY) {
         //当光标在笛卡尔坐标系外拖动时，
         //自动移动数据区。
-        var cursorDistX = this.getCursorCartesianDist(cursorX, this.cartesianXBounds);
-        var cursorDistY = this.getCursorCartesianDist(cursorY, this.cartesianYBounds);
+        let cursorDistX = this.getCursorCartesianDist(cursorX, this.cartesianXBounds);
+        let cursorDistY = this.getCursorCartesianDist(cursorY, this.cartesianYBounds);
 
         if (cursorDistX !== 0 || cursorDistY !== 0) {
             this.autoDataZoomAnimator.start({
@@ -567,5 +570,11 @@ export default {
 <style>
 .margin20{
     margin-left: 20px;
+}
+.open{
+   color: #3E98C5;
+}
+.close{
+   color: #666;
 }
 </style>
