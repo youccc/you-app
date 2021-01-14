@@ -471,7 +471,7 @@ export default {
     },
     //调度数据缩放
     dispatchDataZoom(params) {
-        let option = this.options;
+        let option = this.$refs.chartLoad.chart.getOption()
         let optionInsideX = option.dataZoom[DATA_ZOOM_X_INSIDE_INDEX];
         let optionInsideY = option.dataZoom[DATA_ZOOM_Y_INSIDE_INDEX];
         let batch = [];
