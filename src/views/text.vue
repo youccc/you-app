@@ -62,13 +62,13 @@ export default {
                         show: true,
                         title: 'Make bars\ndraggable',
                         icon: 'path://M990.55 380.08 q11.69 0 19.88 8.19 q7.02 7.01 7.02 18.71 l0 480.65 q-1.17 43.27 -29.83 71.93 q-28.65 28.65 -71.92 29.82 l-813.96 0 q-43.27 -1.17 -72.5 -30.41 q-28.07 -28.07 -29.24 -71.34 l0 -785.89 q1.17 -43.27 29.24 -72.5 q29.23 -29.24 72.5 -29.24 l522.76 0 q11.7 0 18.71 7.02 q8.19 8.18 8.19 18.71 q0 11.69 -7.6 19.29 q-7.6 7.61 -19.3 7.61 l-518.08 0 q-22.22 1.17 -37.42 16.37 q-15.2 15.2 -15.2 37.42 l0 775.37 q0 23.39 15.2 38.59 q15.2 15.2 37.42 15.2 l804.6 0 q22.22 0 37.43 -15.2 q15.2 -15.2 16.37 -38.59 l0 -474.81 q0 -11.7 7.02 -18.71 q8.18 -8.19 18.71 -8.19 l0 0 ZM493.52 723.91 l-170.74 -170.75 l509.89 -509.89 q23.39 -23.39 56.13 -21.05 q32.75 1.17 59.65 26.9 l47.94 47.95 q25.73 26.89 27.49 59.64 q1.75 32.75 -21.64 57.3 l-508.72 509.9 l0 0 ZM870.09 80.69 l-56.13 56.14 l94.72 95.9 l56.14 -57.31 q8.19 -9.35 8.19 -21.05 q-1.17 -12.86 -10.53 -22.22 l-47.95 -49.12 q-10.52 -9.35 -23.39 -9.35 q-11.69 -1.17 -21.05 7.01 l0 0 ZM867.75 272.49 l-93.56 -95.9 l-380.08 380.08 l94.73 94.73 l378.91 -378.91 l0 0 ZM322.78 553.16 l38.59 39.77 l-33.92 125.13 l125.14 -33.92 l38.59 38.6 l-191.79 52.62 q-5.85 1.17 -12.28 0 q-6.44 -1.17 -11.11 -5.84 q-4.68 -4.68 -5.85 -11.7 q-2.34 -5.85 0 -11.69 l52.63 -192.97 l0 0 Z',
-                        onclick: this.onDragSwitchClick
-                    }
-                }
+                        onclick: this.onDragSwitchClick,
+                    },
+                },
             },
             title: {
                 text: 'Gantt of Airport Flight',
-                left: 'center'
+                left: 'center',
             },
             dataZoom: [{
                 type: 'slider',
@@ -299,13 +299,15 @@ export default {
     //OnDrag开关点击
     onDragSwitchClick(model, api, type) {
         this.draggable = !this.draggable;
-        this.options.dataZoom=[{
+        this.$refs.chartLoad.chart.setOption({
+            dataZoom: [{
                 id: 'insideX',
                 disabled: this.draggable
             }, {
                 id: 'insideY',
                 disabled: this.draggable
             }]
+        });
         //图表样式
         //this.model.setIconStatus(type, this.draggable ? 'emphasis' : 'normal');
     },
@@ -356,21 +358,20 @@ export default {
         ]);
 
         this.prepareDrop();
-
-        this.autoDataZoomWhenDraggingOutside(cursorX, cursorY);   
+        this.autoDataZoomWhenDraggingOutside(cursorX, cursorY);
     },
     //松开鼠标
     onMouseup(){
-            // Drop
-            if (this.draggingEl && this.dropRecord) {
-                this.updateRawData() && this.$refs.chartLoad.chart.setOption({
-                    series: {
-                        id: 'flightData',
-                        data: this.rawData.flight.data
-                    }
-                });
-            }
-            this.dragRelease();
+        // Drop
+        if (this.draggingEl && this.dropRecord) {
+            this.updateRawData() && this.$refs.chartLoad.chart.setOption({
+                series: {
+                    id: 'flightData',
+                    data: this.rawData.flight.data
+                }
+            });
+        }
+        this.dragRelease();
     },
     //全部结束
     dragRelease() {
@@ -486,9 +487,9 @@ export default {
             if (cursorDist === 0) {
                 return;
             }
-            var sign = cursorDist / Math.abs(cursorDist);
-            var size = end - start;
-            var delta = DATA_ZOOM_AUTO_MOVE_SPEED * sign;
+            let sign = cursorDist / Math.abs(cursorDist);
+            let size = end - start;
+            let delta = DATA_ZOOM_AUTO_MOVE_SPEED * sign;
 
             start += delta;
             end += delta;
@@ -509,18 +510,18 @@ export default {
     },
     //获取光标笛卡尔距离
     getCursorCartesianDist(cursorXY, bounds) {
-        var dist0 = cursorXY - (bounds[0] + DATA_ZOOM_AUTO_MOVE_DETECT_AREA_WIDTH);
-        var dist1 = cursorXY - (bounds[1] - DATA_ZOOM_AUTO_MOVE_DETECT_AREA_WIDTH);
+        let dist0 = cursorXY - (bounds[0] + DATA_ZOOM_AUTO_MOVE_DETECT_AREA_WIDTH);
+        let dist1 = cursorXY - (bounds[1] - DATA_ZOOM_AUTO_MOVE_DETECT_AREA_WIDTH);
         return dist0 * dist1 <= 0
-            ? 0 // cursor is in cartesian
+            ? 0 // 光标在笛卡尔坐标系中
             : dist0 < 0
-            ? dist0 // cursor is at left/top of cartesian
-            : dist1; // cursor is at right/bottom of cartesian
+            ? dist0 // 光标位于笛卡尔坐标的左/顶部
+            : dist1; // 光标位于笛卡尔坐标系的右/底部
     },
     //制作动画师
     makeAnimator(callback) {
-        var requestId;
-        var callbackParams;
+        let requestId;
+        let callbackParams;
         // 使用节流阀防止频繁调用dispatchAction
         callback = this.$echarts.throttle(callback, DATA_ZOOM_AUTO_MOVE_THROTTLE);
 
@@ -530,20 +531,20 @@ export default {
         }
 
         return {
-            start: function (params) {
+            start: function(params) {
                 callbackParams = params;
                 if (requestId == null) {
                     onFrame();
                 }
             },
-            stop: function () {
+            stop: function() {
                 if (requestId != null) {
                     cancelAnimationFrame(requestId);
                 }
                 requestId = callbackParams = null;
             }
         };
-    }
+    },
   }
 };
 </script>
