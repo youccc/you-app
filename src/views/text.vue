@@ -1,7 +1,13 @@
 <template>
   <div>
     <el-card>
-      <chart style="height:600px;width:100%"  ref="chartLoad" :options="options" ></chart>
+      <el-row>
+          <span class="margin20" v-if="draggable">开启</span>
+          <span class="margin20" v-else >关闭</span>
+      </el-row>
+      <el-row>
+          <chart style="height:600px;width:100%" @click="handleChartClick" ref="chartLoad" :options="options" ></chart>
+      </el-row>
     </el-card>
   </div>
 </template>
@@ -57,6 +63,7 @@ export default {
                 left: 20,
                 top: 0,
                 itemSize: 20,
+                // iconStyle:{ borderColor: "red" },
                 feature: {
                     myDrag: {
                         show: true,
@@ -67,7 +74,7 @@ export default {
                 },
             },
             title: {
-                text: 'Gantt of Airport Flight',
+                text: '这谁整的',
                 left: 'center',
             },
             dataZoom: [{
@@ -293,6 +300,9 @@ export default {
           height: params.coordSys.height
       });
     },
+    handleChartClick(d){
+        // debugger
+    },
     // -------------
     //  启用拖动
     // -------------
@@ -310,6 +320,11 @@ export default {
         });
         //图表样式
         //this.model.setIconStatus(type, this.draggable ? 'emphasis' : 'normal');
+        if(this.draggable){
+            this.$refs.chartLoad.chart._model.option.toolbox[0].iconStyle.borderColor="#3E98C5"
+        }else{
+            this.$refs.chartLoad.chart._model.option.toolbox[0].iconStyle.borderColor="#666"
+        }
     },
     initDrag() {
         this.autoDataZoomAnimator = this.makeAnimator(this.dispatchDataZoom);
@@ -550,5 +565,7 @@ export default {
 </script>
 
 <style>
-
+.margin20{
+    margin-left: 20px;
+}
 </style>
