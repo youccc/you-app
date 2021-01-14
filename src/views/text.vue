@@ -15,15 +15,17 @@
 <script>
 import chart from "vue-echarts/components/ECharts";
 import airportData from "@/assets/airport-schedule.json";
+
 const HEIGHT_RATIO = 0.9; //bar高度
 const DIM_CATEGORY_INDEX = 0; //尺寸分类索引
-const DIM_TIME_ARRIVAL = 1;
-const DIM_TIME_DEPARTURE = 2;
-const DATA_ZOOM_AUTO_MOVE_THROTTLE = 30;
-const DATA_ZOOM_X_INSIDE_INDEX = 1;
-const DATA_ZOOM_Y_INSIDE_INDEX = 3;
-const DATA_ZOOM_AUTO_MOVE_SPEED = 0.2;
-const DATA_ZOOM_AUTO_MOVE_DETECT_AREA_WIDTH = 30;
+const DIM_TIME_ARRIVAL = 1; //抵达时间
+const DIM_TIME_DEPARTURE = 2;//起飞时间
+const DATA_ZOOM_AUTO_MOVE_THROTTLE = 30;//数据缩放自动移动节流
+const DATA_ZOOM_X_INSIDE_INDEX = 1; //数据缩放X内部索引
+const DATA_ZOOM_Y_INSIDE_INDEX = 3; //数据缩放Y内部索引
+const DATA_ZOOM_AUTO_MOVE_SPEED = 0.2; //数据缩放自动移动速度
+const DATA_ZOOM_AUTO_MOVE_DETECT_AREA_WIDTH = 30;//数据缩放自动移动检测区域宽度
+
 export default {
   name: "hello",
   components: {
@@ -31,32 +33,30 @@ export default {
   },
   data() {
     return {
-        draggable:'',
-        draggingEl:'',
-        dropShadow:'',
-        draggingCursorOffset : [0, 0],
-        draggingTimeLength:'',
-        draggingRecord:'',
-        dropRecord:'',
-        cartesianXBounds : [],
-        cartesianYBounds : [],
-        rawData:'',
-        autoDataZoomAnimator:'',
-        options:{}
+        draggable:'', //是否拖动判断
+        draggingEl:'',//拖动元素
+        dropShadow:'', //拖动阴影
+        draggingCursorOffset : [0, 0], //拖动光标偏移
+        draggingTimeLength:'', //拖动时间长度
+        draggingRecord:'', //拖动记录
+        dropRecord:'', //删除记录
+        cartesianXBounds : [], //直角 x 边界
+        cartesianYBounds : [], //直角 y 边界
+        autoDataZoomAnimator:'', //自动数据缩放器
+        rawData:'', //原始数据
+        options:{} //echarts 选项
     };
   },
-  created(){
-  },
   mounted(){
-    //数据
+    //原始数据
     this.rawData = airportData;
-    //数据传递
+    //设置echarts 选项
     this.options=this.makeOption()
-    //拖拽
+    //初始拖拽
     this.initDrag();
   },
   methods: {
-    //echars选项
+    //echarts设置选项
     makeOption() {
         return {
             tooltip: {
@@ -77,7 +77,7 @@ export default {
                 },
             },
             title: {
-                text: '这谁整的',
+                text: '神佑我',
                 left: 'center',
             },
             dataZoom: [{
@@ -186,7 +186,7 @@ export default {
             }]
         };
     },
-    //渲染器
+    //series 数据渲染器
     renderGanttItem(params, api) {
         let categoryIndex = api.value(DIM_CATEGORY_INDEX);
         let timeArrival = api.coord([api.value(DIM_TIME_ARRIVAL), categoryIndex]);
@@ -246,7 +246,7 @@ export default {
             }]
         };
     },
-    //渲染轴标签
+    //轴标签 数据渲染器
     renderAxisLabelItem(params, api) {
         let y = api.coord([0, api.value(0)])[1];
         if (y < params.coordSys.y + 5) {
@@ -303,8 +303,9 @@ export default {
           height: params.coordSys.height
       });
     },
+    //点击事件
     handleChartClick(d){
-        // debugger
+        debugger
     },
     // -------------
     //  启用拖动
@@ -329,6 +330,7 @@ export default {
             this.$refs.chartLoad.chart._model.option.toolbox[0].iconStyle.borderColor="#666"
         }
     },
+    //初始化 拖动
     initDrag() {
         this.autoDataZoomAnimator = this.makeAnimator(this.dispatchDataZoom);
         //鼠标按下
@@ -340,7 +342,7 @@ export default {
         //全部结束
         this.$refs.chartLoad.chart.getZr().on('globalout', this.dragRelease);
     },
-    //鼠标按下
+    //鼠标按下 动作
     mousedown (param) {
         if (!this.draggable || !param || param.seriesIndex == null) {
             return;
@@ -361,7 +363,7 @@ export default {
         ];
         this.draggingTimeLength = this.draggingRecord.timeDeparture - this.draggingRecord.timeArrival;
     },
-    //鼠标移动
+    //鼠标移动 动作
     mousemove (event) {
         if (!this.draggingEl) {
             return;
@@ -378,7 +380,7 @@ export default {
         this.prepareDrop();
         this.autoDataZoomWhenDraggingOutside(cursorX, cursorY);
     },
-    //松开鼠标
+    //松开鼠标 动作
     onMouseup(){
         // Drop
         if (this.draggingEl && this.dropRecord) {
@@ -391,7 +393,7 @@ export default {
         }
         this.dragRelease();
     },
-    //全部结束
+    //全部结束 动作
     dragRelease() {
             this.autoDataZoomAnimator.stop();
 
@@ -446,7 +448,7 @@ export default {
             this.dropShadow = this.addOrUpdateBar(this.dropShadow,this.dropRecord, style, 99);
         }
     },
-    // 这是一些商业逻辑，不要在意
+    // 原始数据 冲突判断
     updateRawData() {
         let flightData = this.rawData.flight.data;
         let movingItem = flightData[this.draggingRecord.dataIndex];
@@ -536,7 +538,7 @@ export default {
             ? dist0 // 光标位于笛卡尔坐标的左/顶部
             : dist1; // 光标位于笛卡尔坐标系的右/底部
     },
-    //制作动画师
+    //制作动画
     makeAnimator(callback) {
         let requestId;
         let callbackParams;
