@@ -305,6 +305,8 @@ export default {
     },
     //点击事件
     handleChartClick(d){
+        let offsetX=d.event.offsetX
+        let offsetY=d.event.offsetY
         debugger
     },
     // -------------
