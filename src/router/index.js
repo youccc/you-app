@@ -20,6 +20,11 @@ const routes = [
     name: 'text',
     component: () => import('../views/text.vue')
   },
+  {
+    path: '/text1',
+    name: 'text1',
+    component: () => import('../views/text1.vue')
+  },
 ]
 
 const router = new VueRouter({
